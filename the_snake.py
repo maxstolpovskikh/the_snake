@@ -46,7 +46,7 @@ clock = pygame.time.Clock()
 class GameObject():  # ABC
     """Это базовый класс, от которого наследуются другие игровые объекты."""
 
-    position = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)),]
+    position = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
 
     @abstractmethod
     def draw(self):
@@ -159,7 +159,7 @@ class Snake(GameObject):
         Cбрасывает змейку в начальное
         состояние после столкновения с собой.
         """
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)),]
+        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
         self.length = 1
         self.direction = RIGHT
         screen.fill(BOARD_BACKGROUND_COLOR)
