@@ -100,11 +100,7 @@ class Snake(GameObject):
 
     def __init__(self, direction=RIGHT, next_direction=None):
         super().__init__()
-        self.length = 1
-        self.direction = direction
-        self.next_direction = next_direction
-        self.positions = self.position
-        self.last = None
+        self.reset()
 
     def draw(self):
         """Отрисовывает змейку на экране, затирая след"""
@@ -148,14 +144,16 @@ class Snake(GameObject):
         if head_new in self.positions[1:]:
             self.reset()
 
-    def reset(self):
+    def reset(self, direction=RIGHT, next_direction=None):
         """
         Сбрасывает змейку в начальное
         состояние после столкновения с собой.
         """
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
         self.length = 1
-        self.direction = RIGHT
+        self.direction = direction
+        self.next_direction = next_direction
+        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
+        self.last = None
         screen.fill(BOARD_BACKGROUND_COLOR)
 
 
