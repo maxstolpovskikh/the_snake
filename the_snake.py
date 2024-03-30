@@ -1,5 +1,7 @@
 from random import randint
 from abc import abstractmethod
+from typing import Optional as Opt
+
 import pygame
 
 
@@ -43,10 +45,11 @@ pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 
 
-class GameObject():  # ABC
+class GameObject:
     """Это базовый класс, от которого наследуются другие игровые объекты."""
 
-    position = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
+    def __init__(self):
+        self.position = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
 
     @abstractmethod
     def draw(self):
@@ -54,13 +57,11 @@ class GameObject():  # ABC
         Это абстрактный метод, который предназначен для
         переопределения в дочерних классах.
         """
-        pass
 
-    @property
     @abstractmethod
     def body_color(self):
         """Цвет объекта. Он задаётся в дочернем классе."""
-        pass
+        return self.body_color
 
 
 class Apple(GameObject):
@@ -69,11 +70,10 @@ class Apple(GameObject):
     Яблоко должно отображаться в случайных клетках игрового поля.
     """
 
-    body_color = APPLE_COLOR
-
-    def __init__(self):
+    def __init__(self,):
         super().__init__()
         self.position = self.randomize_position()
+        self.body_color = APPLE_COLOR
 
     def draw(self):
         """Отрисовывает яблоко на игровой поверхности"""
@@ -84,9 +84,9 @@ class Apple(GameObject):
     @staticmethod
     def randomize_position():
         """Генерация случайных координат"""
-        def a(x):
-            return randint(0, x - GRID_SIZE) * GRID_SIZE
-        return (a(GRID_WIDTH), a(GRID_HEIGHT))
+        def random_coordinate(grid_length):
+            return randint(0, grid_length - GRID_SIZE) * GRID_SIZE
+        return (random_coordinate(GRID_WIDTH), random_coordinate(GRID_HEIGHT))
 
 
 class Snake(GameObject):
@@ -96,14 +96,17 @@ class Snake(GameObject):
     отдельному сегменту тела змейки.
     """
 
-    body_color = SNAKE_COLOR
-
-    def __init__(self, direction=RIGHT, next_direction=None):
+    def __init__(self):
         super().__init__()
+        self.body_color = SNAKE_COLOR
+        self.screen_fill = None
         self.reset()
 
     def draw(self):
         """Отрисовывает змейку на экране, затирая след"""
+        if self.screen_fill:
+            screen.fill(BOARD_BACKGROUND_COLOR)
+            self.screen_fill = None
         for position in self.positions[:-1]:
             rect = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
             pygame.draw.rect(screen, self.body_color, rect)
@@ -136,25 +139,23 @@ class Snake(GameObject):
         """Отвечает за обновление положения змейки в игре."""
         head = self.get_head_position()
         direction = self.direction
-        x, y = (head[i] + direction[i] * GRID_SIZE for i in range(0, 2))
-        head_new = (x % SCREEN_WIDTH, y % SCREEN_HEIGHT)
+        abscissa, ordinate = (
+            head[i] + direction[i] * GRID_SIZE for i in range(0, 2))
+        head_new = (abscissa % SCREEN_WIDTH, ordinate % SCREEN_HEIGHT)
         self.positions.insert(0, head_new)
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
         if head_new in self.positions[1:]:
             self.reset()
 
-    def reset(self, direction=RIGHT, next_direction=None):
-        """
-        Сбрасывает змейку в начальное
-        состояние после столкновения с собой.
-        """
+    def reset(self, direction: tuple = RIGHT, next_dir: Opt[tuple] = None):
+        """Сбрасывает змейку в начальное состояние."""
         self.length = 1
         self.direction = direction
-        self.next_direction = next_direction
+        self.next_direction = next_dir
         self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
+        self.screen_fill = True
         self.last = None
-        screen.fill(BOARD_BACKGROUND_COLOR)
 
 
 def handle_keys(game_object):
@@ -166,7 +167,7 @@ def handle_keys(game_object):
         if event.type == pygame.QUIT:
             pygame.quit()
             raise SystemExit
-        elif event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and game_object.direction != DOWN:
                 game_object.next_direction = UP
             elif event.key == pygame.K_DOWN and game_object.direction != UP:
