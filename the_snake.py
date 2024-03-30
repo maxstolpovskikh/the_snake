@@ -141,13 +141,7 @@ class Snake(GameObject):
         head = self.get_head_position()
         direction = self.direction
         x, y = (head[i] + direction[i] * GRID_SIZE for i in range(0, 2))
-
-        def bg(a, screen_param):
-            screen_param -= GRID_SIZE
-            a = 0 if a > screen_param else screen_param if a < 0 else a
-            return a
-
-        head_new = (bg(x, SCREEN_WIDTH), bg(y, SCREEN_HEIGHT))
+        head_new = (x % SCREEN_WIDTH, y % SCREEN_HEIGHT)
         self.positions.insert(0, head_new)
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
@@ -156,7 +150,7 @@ class Snake(GameObject):
 
     def reset(self):
         """
-        Cбрасывает змейку в начальное
+        Сбрасывает змейку в начальное
         состояние после столкновения с собой.
         """
         self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)), ]
@@ -186,7 +180,7 @@ def handle_keys(game_object):
 
 
 def main():
-    """тут док стринг"""
+    """Основной цикл игры"""
     apple = Apple()
     snake = Snake()
 
