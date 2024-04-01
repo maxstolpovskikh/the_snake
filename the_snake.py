@@ -84,7 +84,7 @@ class Apple(GameObject):
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     @staticmethod
-    # раз у нас есть busy_cells, сделаем вот так
+    # раз у нас есть busy_cells, сделаем вот так?
     def randomize_position(self) -> tuple:
         """Генерация случайных координат"""
         def rnd_coord(grid_length):
@@ -92,6 +92,8 @@ class Apple(GameObject):
 
         while True:
             coordinates = (rnd_coord(GRID_WIDTH), rnd_coord(GRID_HEIGHT))
+            if not self.busy_cells:
+                break
             if coordinates not in self.busy_cells:
                 break
 
